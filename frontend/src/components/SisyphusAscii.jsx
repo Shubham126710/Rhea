@@ -1,11 +1,10 @@
 import { useEffect, useRef } from "react";
 
-const ASCII = [" ", "·", ".", "•", "▪"];
+const ASCII = [" ", ".", "·", "•", "▪", "█"];
 
 export default function SisyphusAscii({
   src = "/sisyphus.png",
-  density = 5,
-  color = "#F4F3EE",
+  density = 3, // Lower density = higher resolution point cloud
 }) {
   const canvasRef = useRef(null);
   const imageRef = useRef(null);
@@ -21,7 +20,6 @@ export default function SisyphusAscii({
     const image = new Image();
     image.crossOrigin = "anonymous";
     image.src = src;
-
     imageRef.current = image;
 
     let animationFrame;
@@ -30,7 +28,6 @@ export default function SisyphusAscii({
 
     const resize = () => {
       const rect = canvas.getBoundingClientRect();
-
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
 
       width = Math.max(1, Math.floor(rect.width));
@@ -50,18 +47,9 @@ export default function SisyphusAscii({
         return;
       }
 
-      /*
-       * Offscreen canvas.
-       * The actual implementation can use this to sample
-       * luminance from the Sisyphus artwork.
-       */
-
       const offscreen = document.createElement("canvas");
-
       const sampleWidth = Math.floor(width / density);
-      const aspect =
-        image.naturalHeight / image.naturalWidth;
-
+      const aspect = image.naturalHeight / image.naturalWidth;
       const sampleHeight = Math.floor(sampleWidth * aspect);
 
       offscreen.width = sampleWidth;
@@ -71,27 +59,15 @@ export default function SisyphusAscii({
         willReadFrequently: true,
       });
 
-      offCtx.drawImage(
-        image,
-        0,
-        0,
-        sampleWidth,
-        sampleHeight
-      );
-
-      const pixels = offCtx.getImageData(
-        0,
-        0,
-        sampleWidth,
-        sampleHeight
-      ).data;
+      offCtx.drawImage(image, 0, 0, sampleWidth, sampleHeight);
+      const pixels = offCtx.getImageData(0, 0, sampleWidth, sampleHeight).data;
 
       const offsetX = (width - sampleWidth * density) / 2;
       const offsetY = (height - sampleHeight * density) / 2;
 
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
-      ctx.font = `${Math.max(3, density)}px monospace`;
+      ctx.font = `${Math.max(4, density * 1.5)}px monospace`;
 
       for (let y = 0; y < sampleHeight; y++) {
         for (let x = 0; x < sampleWidth; x++) {
@@ -100,51 +76,36 @@ export default function SisyphusAscii({
           const r = pixels[index];
           const g = pixels[index + 1];
           const b = pixels[index + 2];
-          const a = pixels[index + 3];
+          
+          // True luminance formula
+          const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
 
-          if (a < 30) continue;
+          // Ignore pure black background (or very close to it)
+          if (luminance < 0.05) continue;
 
-          const luminance =
-            (0.299 * r +
-              0.587 * g +
-              0.114 * b) /
-            255;
-
-          if (luminance < 0.12) continue;
-
-          /*
-           * Tiny animated signal drift.
-           * Keep this extremely subtle.
-           */
-          const wave =
-            Math.sin(
-              time * 0.001 +
-              x * 0.12 +
-              y * 0.08
-            ) * 0.35;
-
-          const alpha =
-            Math.min(
-              1,
-              luminance * 1.35
-            ) *
-            (0.75 + wave * 0.15);
-
+          // Tiny animated signal drift. Keep this extremely subtle.
+          const wave = Math.sin(time * 0.002 + x * 0.1 + y * 0.1) * 0.15;
+          const flicker = Math.random() > 0.98 ? 0.2 : 0;
+          
+          // Higher opacity for visibility, maintaining the structural silhouette
+          const alpha = Math.min(1, Math.max(0.15, luminance + wave + flicker));
           ctx.globalAlpha = alpha;
 
-          const character =
-            ASCII[
-              Math.min(
-                ASCII.length - 1,
-                Math.floor(
-                  luminance * ASCII.length
-                )
-              )
-            ];
+          // Determine character based on luminance
+          let charIndex = Math.floor(luminance * ASCII.length);
+          if (charIndex >= ASCII.length) charIndex = ASCII.length - 1;
+          const character = ASCII[charIndex];
 
           if (!character.trim()) continue;
 
-          ctx.fillStyle = color;
+          // Dual-tone coloring based on luminance to match Rhea's palette
+          if (luminance > 0.7) {
+            ctx.fillStyle = "#F4F3EE"; // Ivory for highlights
+          } else if (luminance > 0.4) {
+            ctx.fillStyle = "rgba(244, 243, 238, 0.7)"; // Faded Ivory
+          } else {
+            ctx.fillStyle = "#3b82f6"; // Rhea Cobalt variant for shadows/midtones
+          }
 
           ctx.fillText(
             character,
@@ -155,36 +116,28 @@ export default function SisyphusAscii({
       }
 
       ctx.globalAlpha = 1;
-
-      animationFrame =
-        requestAnimationFrame(draw);
+      animationFrame = requestAnimationFrame(draw);
     };
 
     const observer = new ResizeObserver(resize);
-
     observer.observe(canvas);
 
     image.onload = () => {
       resize();
-      animationFrame =
-        requestAnimationFrame(draw);
+      animationFrame = requestAnimationFrame(draw);
     };
 
     return () => {
       cancelAnimationFrame(animationFrame);
       observer.disconnect();
     };
-  }, [src, density, color]);
+  }, [src, density]);
 
   return (
-    <div
-      className="pointer-events-none absolute inset-0"
-      aria-hidden="true"
-    >
-      <canvas
-        ref={canvasRef}
-        className="h-full w-full"
-      />
+    <div className="pointer-events-none absolute inset-0 flex items-center justify-center" aria-hidden="true">
+      <div className="relative w-full h-[120%] lg:w-[150%] lg:h-[150%] flex items-center justify-center -mr-[10%]">
+        <canvas ref={canvasRef} className="h-full w-full object-contain" />
+      </div>
     </div>
   );
 }

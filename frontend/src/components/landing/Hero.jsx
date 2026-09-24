@@ -67,7 +67,7 @@ export function Hero() {
           transition={{ duration: 2, delay: 0.5 }}
           className="w-full lg:w-[50%] flex justify-center lg:justify-end absolute lg:relative top-0 right-0 h-full lg:h-[700px] -z-10 lg:z-20 opacity-30 lg:opacity-100"
         >
-           <SisyphusAscii density={5} />
+           <SisyphusAscii />
         </motion.div>
         
       </div>
