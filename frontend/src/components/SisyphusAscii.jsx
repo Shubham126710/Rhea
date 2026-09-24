@@ -78,17 +78,20 @@ export default function SisyphusAscii({
           const b = pixels[index + 2];
           
           // True luminance formula
-          const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+          let luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+          
+          // Boost luminance so the image pops more
+          luminance = Math.min(1, luminance * 1.5);
 
-          // Ignore pure black background (or very close to it)
+          // Ignore pure black background
           if (luminance < 0.05) continue;
 
           // Tiny animated signal drift. Keep this extremely subtle.
           const wave = Math.sin(time * 0.002 + x * 0.1 + y * 0.1) * 0.15;
           const flicker = Math.random() > 0.98 ? 0.2 : 0;
           
-          // Higher opacity for visibility, maintaining the structural silhouette
-          const alpha = Math.min(1, Math.max(0.15, luminance + wave + flicker));
+          // Higher base opacity (0.3 instead of 0.15)
+          const alpha = Math.min(1, Math.max(0.3, luminance + wave + flicker));
           ctx.globalAlpha = alpha;
 
           // Determine character based on luminance
@@ -98,13 +101,13 @@ export default function SisyphusAscii({
 
           if (!character.trim()) continue;
 
-          // Dual-tone coloring based on luminance to match Rhea's palette
-          if (luminance > 0.7) {
-            ctx.fillStyle = "#F4F3EE"; // Ivory for highlights
-          } else if (luminance > 0.4) {
-            ctx.fillStyle = "rgba(244, 243, 238, 0.7)"; // Faded Ivory
+          // Use Ivory/White variations for the whole figure so it contrasts sharply against the cobalt background
+          if (luminance > 0.6) {
+            ctx.fillStyle = "#ffffff"; // Pure White for highlights
+          } else if (luminance > 0.3) {
+            ctx.fillStyle = "rgba(244, 243, 238, 0.85)"; // Strong Ivory for midtones
           } else {
-            ctx.fillStyle = "#3b82f6"; // Rhea Cobalt variant for shadows/midtones
+            ctx.fillStyle = "rgba(244, 243, 238, 0.4)"; // Faded Ivory for shadows (NO cobalt, it blends in too much)
           }
 
           ctx.fillText(
