@@ -1,0 +1,24 @@
+# Dual-layer GNN (Architecture.md's Content Encoder -> Propagation GNN
+# + Interaction GNN -> Fusion -> Classification Head; Decision 2: two
+# relation types -- direct_share, inherited_share -- within one UPFD
+# graph, not two separate graphs).
+# Forward/backward pass is real and tested on synthetic graphs; real
+# UPFD data is network-blocked (Google Drive) in this sandbox -- see
+# propagate_research/data/upfd_loader.py and models/dual_layer_gnn.py.
+model_type: dual_gnn
+dataset: politifact
+feature: bert  # see upfd_loader.py's DEFAULT_FEATURE rationale
+seed: 42
+hyperparameters:
+  hidden_channels: 128
+  num_relations: 2
+  dropout: 0.3
+  epochs: 100
+  lr: 0.001
+  batch_size: 128
+  # ablation: full (default) | propagation_only | interaction_only
+  # -- Phases.md's ablation study; see graph/build_graph.py's
+  # apply_ablation(). Omitted here since "full" is this config's
+  # intended default, not because the option doesn't exist.
+checkpoint_dir: model_checkpoints/dual_gnn
+output_dir: evaluation

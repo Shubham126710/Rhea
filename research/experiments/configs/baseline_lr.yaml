@@ -1,0 +1,11 @@
+# TF-IDF + Logistic Regression baseline (Phases.md Batch J).
+# Real, executable model -- see propagate_research/models/baselines.py.
+model_type: baseline_lr
+dataset: politifact
+seed: 42
+hyperparameters:
+  max_features: 20000
+  ngram_range: [1, 2]
+  C: 1.0
+checkpoint_dir: model_checkpoints/baseline_lr
+output_dir: evaluation

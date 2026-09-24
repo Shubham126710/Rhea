@@ -1,0 +1,9 @@
+-r requirements.txt
+pytest==8.3.4
+ruff==0.8.4
+mypy==1.13.0
+# test-only fixture generator for shared_preprocessing PDF tests —
+# was used but never pinned here in the previous session's work,
+# found because a genuinely clean requirements-dev.txt install
+# couldn't even collect tests/unit/shared_preprocessing/test_extraction.py
+reportlab==5.0.1

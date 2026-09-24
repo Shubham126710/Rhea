@@ -1,0 +1,19 @@
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: propagate
+      POSTGRES_PASSWORD: propagate
+      POSTGRES_DB: propagate
+    ports:
+      - "5432:5432"
+    volumes:
+      - propagate_postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7
+    ports:
+      - "6379:6379"
+
+volumes:
+  propagate_postgres_data:

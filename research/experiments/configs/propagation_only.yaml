@@ -1,0 +1,23 @@
+# Structural ablation of dual_gnn.yaml: propagation_only variant.
+# Generated from dual_gnn.yaml by adding hyperparameters.ablation
+# (read via hp.get("ablation", "full") in run_experiment.py) --
+# real edges are removed by graph/build_graph.py's apply_ablation()
+# before batching, same real model/training code path as the full
+# dual_gnn run, just with one relation type's edges excluded. This
+# materializes Phases.md's ablation study, which the existing code
+# already supported but had no committed config file for.
+# propagate_research/data/upfd_loader.py and models/dual_layer_gnn.py.
+model_type: dual_gnn
+dataset: politifact
+feature: bert  # see upfd_loader.py's DEFAULT_FEATURE rationale
+seed: 42
+hyperparameters:
+  ablation: propagation_only
+  hidden_channels: 128
+  num_relations: 2
+  dropout: 0.3
+  epochs: 100
+  lr: 0.001
+  batch_size: 128
+checkpoint_dir: model_checkpoints/dual_gnn_propagation_only
+output_dir: evaluation

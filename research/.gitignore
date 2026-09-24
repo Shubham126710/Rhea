@@ -1,0 +1,26 @@
+# Generated caches -- never source
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# Local virtual environment (Windows repo currently has research/.venv
+# present locally -- must never be committed)
+.venv/
+venv/
+
+# Downloaded/generated at runtime, not source (Architecture.md §9:
+# "Raw datasets, intermediate experiment artifacts, and baseline
+# models never enter production" -- same principle applies to version
+# control here)
+datasets/*
+!datasets/.gitkeep
+model_checkpoints/*
+!model_checkpoints/.gitkeep
+evaluation/**/*
+!evaluation/**/.gitkeep
+
+# UPFD download target used by upfd_loader.py / run_experiment.py's
+# DEFAULT_UPFD_ROOT and PROPAGATE_UPFD_ROOT override
+upfd_data/

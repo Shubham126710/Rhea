@@ -1,0 +1,15 @@
+# Text-Encoder + MLP baseline (Phases.md Batch J).
+# MLP head is real and tested against synthetic embeddings; the
+# sentence-transformers encoder step requires network access to
+# huggingface.co, unverified in this sandbox -- see
+# propagate_research/encoders/content_encoder.py.
+model_type: text_mlp
+dataset: politifact
+seed: 42
+hyperparameters:
+  encoder_name: all-MiniLM-L6-v2
+  hidden_dim: 128
+  epochs: 50
+  lr: 0.01
+checkpoint_dir: model_checkpoints/text_mlp
+output_dir: evaluation

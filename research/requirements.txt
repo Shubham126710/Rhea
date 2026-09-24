@@ -1,0 +1,32 @@
+# Research pipeline dependencies (Architecture.md §9) -- this
+# environment never imports FROM the production backend. The reverse
+# is not true: backend/app/ml_inference/ deliberately imports this
+# package directly (see model_loader.py's docstring) to reconstruct
+# the exact trained architecture rather than risk a drifted
+# reimplementation -- backend/requirements.txt pins torch/torch-
+# geometric to match these exact versions for that reason.
+#
+# Every version below is pinned to exactly what was installed and used
+# to produce the 202/202 passing test run and the live torch/PyG/
+# sentence-transformers execution documented in research/README.md —
+# not a guess, not "latest at time of writing".
+#
+# Installed from plain PyPI (this environment has no route to
+# download.pytorch.org), which resolves torch to a build tagged for
+# whatever CUDA toolkit PyPI's default wheel bundles; only CPU
+# execution has been exercised or is expected before a real Colab/
+# Kaggle GPU environment is used, per Decision 4.
+
+torch==2.13.0
+torch-geometric==2.8.0.post1
+sentence-transformers==6.0.0
+
+numpy==2.4.6
+scipy==1.17.1
+scikit-learn==1.9.0
+networkx==3.6.1
+PyYAML==6.0.3
+
+# dev/test tooling for this environment
+pytest==9.1.1
+ruff==0.8.4

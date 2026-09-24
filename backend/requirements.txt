@@ -1,0 +1,30 @@
+fastapi==0.115.6
+uvicorn[standard]==0.32.1
+sqlalchemy==2.0.36
+psycopg[binary]==3.2.3
+alembic==1.14.0
+pydantic[email]==2.10.3
+pydantic-settings==2.7.0
+argon2-cffi==23.1.0
+httpx==0.28.1
+trafilatura==2.2.0
+pypdf==6.16.2
+
+# Phase 4 (ML Inference, Phases.md) -- Architecture.md's overview
+# describes ML inference as an internal module of the same backend
+# service for v1 (a modular monolith, not microservices; this
+# placement is not itself a locked "Batch" decision -- see
+# ml_inference/model_loader.py's docstring). Versions match exactly
+# what research/requirements.txt already pins and has been verified
+# against real UPFD data -- production must reconstruct the identical
+# architecture Phase 3 trained, not a second copy that could drift.
+torch==2.13.0
+torch-geometric==2.8.0.post1
+
+# Phase 5 (Analysis Orchestration) -- Architecture.md §6.3 Redis-backed
+# job queue; rq is the lightest option matching Architecture's own
+# "e.g. RQ or Celery+Redis". python-multipart is FastAPI's own
+# documented requirement for UploadFile form parsing.
+redis==5.0.8
+rq==1.16.2
+python-multipart==0.0.20

@@ -1,0 +1,22 @@
+# Cross-domain zero-shot evaluation (PolitiFact <-> GossipCop -- the
+# "<->" in Phases.md is read literally as both directions, run
+# together, not one; see the Phase 3 report's methodology-decision
+# section). No fine-tuning on the target domain (zero-shot, by
+# construction -- see run_experiment.py's _evaluate_dual_gnn).
+# cross_domain_eval: true is what actually triggers this path (routed
+# in run_experiment.py's main()); dataset below only selects which of
+# the two directions runs first -- both directions always run.
+model_type: dual_gnn
+dataset: politifact
+feature: bert
+seed: 42
+cross_domain_eval: true
+hyperparameters:
+  hidden_channels: 128
+  num_relations: 2
+  dropout: 0.3
+  epochs: 100
+  lr: 0.001
+  batch_size: 128
+checkpoint_dir: model_checkpoints/cross_domain
+output_dir: evaluation
